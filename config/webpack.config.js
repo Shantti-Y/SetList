@@ -1,13 +1,15 @@
 const path = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+require('dotenv').config();
 
-const entryDir = '../frontend';
+const frontendDir = '../frontend';
+const entryDir = '../frontend/entrypoints';
 
 module.exports = {
-  entry: ['@babel/polyfill', path.resolve(__dirname, `${entryDir}/entry.js`)],
+  entry: {
+    index: ['@babel/polyfill', path.resolve(__dirname, `${entryDir}/index.js`)]
+  },
   module: {
     rules: [
       {
@@ -49,14 +51,15 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.jpg', '.scss'],
     alias: {
-      '@apis': path.resolve(__dirname, `${entryDir}/apis`),
-      '@layouts': path.resolve(__dirname, `${entryDir}/layouts`),
-      '@components': path.resolve(__dirname, `${entryDir}/components`),
-      '@routes': path.resolve(__dirname, `${entryDir}/routes`)
+      '@apis': path.resolve(__dirname, `${frontendDir}/apis`),
+      '@layouts': path.resolve(__dirname, `${frontendDir}/layouts`),
+      '@components': path.resolve(__dirname, `${frontendDir}/components`),
+      '@routes': path.resolve(__dirname, `${frontendDir}/routes`)
     }
   },
   plugins: [
     new ManifestPlugin(),
+    new webpack.EnvironmentPlugin(['SPOTIFY_API_CLIENT_ID', 'NODE_ENV'])
     //new CleanWebpackPlugin(['dist/dev'], { watch: true })
   ]
 };
