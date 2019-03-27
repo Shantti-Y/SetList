@@ -21,17 +21,23 @@ class SpotifyClientSingleton {
 }
 let spotifyClient;
 
-const getSpotifyClient = async () => {
+const getSpotifyClient = async (grantType, code = '') => {
   if (spotifyClient === undefined || spotifyClient.isExpired()) {
-    await postAuthorize();
+    await postFetchingAuthorizationToken(grantType, code);
   }
   return spotifyClient
 }
 
-const postAuthorize = async () => {
+const postFetchingAuthorizationToken = async (grantType, code) => {
   const clientId = process.env.SPOTIFY_API_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_API_CLIENT_SECRET;
-
+  const params = grantType === 'authorization_code' ? {
+    grant_type: 'authorization_code',
+    code: code,
+    redirect_uri: 'http://localhost:8080/api/start_playlist'
+  } : {
+    grant_type: 'client_credentials'
+  }
   const { data } = await axios({
     url: 'https://accounts.spotify.com/api/token',
     method: 'POST',
@@ -40,9 +46,7 @@ const postAuthorize = async () => {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Accept': 'application/json'
     },
-    params: {
-      'grant_type': 'client_credentials'
-    },
+    params: params,
     auth: {
       username: clientId,
       password: clientSecret
@@ -52,4 +56,4 @@ const postAuthorize = async () => {
     data.expires_in, data.token_type, data.access_token);
 }
 
-module.exports = getSpotifyClient;
+module.exports = { getSpotifyClient };

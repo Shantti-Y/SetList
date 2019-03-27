@@ -1,12 +1,21 @@
 const express = require('express');
 const moment = require('moment');
 const apiRouter = express.Router();
+const path = require('path');
 
-const { getTracksBySearch } = require('./spotifyAPIs');
+const callbackURI = 'http://localhost:8080/callback';
 
-apiRouter.get('/create_playlist', async (req, res) => {
-  
-  const isSumdurationLessThanMaximum = (tracks, targetDuration) => {
+const {
+  getTracksBySearch,
+  getUserDevices,
+  putStartingUserPlayback,
+  getCurrentUserProfile,
+  postCreatingPlaylist,
+  postAddingTracksToPlaylist
+} = require('./spotifyAPIs');
+
+apiRouter.get('/initialize_playlist', async (req, res) => {
+  const isSumDurationLessThanMaximum = (tracks, targetDuration) => {
     const getSumDuration = (total, duration) => {
       return total + duration;
     }
@@ -51,7 +60,7 @@ apiRouter.get('/create_playlist', async (req, res) => {
       } else {
         playDurations.splice(selectedPlayDurationIdx, 1);
       }
-      if (isSumdurationLessThanMaximum(responseTracks, targetDuration)) {
+      if (isSumDurationLessThanMaximum(responseTracks, targetDuration)) {
         // Response data
         const responseData = {
           tracks: responseTracks,
@@ -65,5 +74,26 @@ apiRouter.get('/create_playlist', async (req, res) => {
     pageIdx += 1;
   }
 });
+
+const callbackHtmlFile = path.resolve(__dirname, '../../callback.html');
+apiRouter.get('/start_playlist', async (req, res) => {
+  if (req.query.code !== undefined){
+    const trackIds = req.query.state.split(',')
+    const authorizationCode = req.query.code;
+    const userProfile = await getCurrentUserProfile(authorizationCode);
+    const playListDetail = await postCreatingPlaylist(authorizationCode, userProfile.id);
+    const devices = await getUserDevices(authorizationCode);
+    await postAddingTracksToPlaylist(authorizationCode, playListDetail.id, trackIds);
+    await putStartingUserPlayback(authorizationCode, devices[0], playListDetail.id);
+    res.redirect(callbackURI);
+  }else{
+    res.status(404).send({
+      error: {
+        status: 404,
+        message: `Couldn't create playlist due to lack of tracks.`
+      }
+    });
+  }
+})
 
 module.exports = apiRouter; 
