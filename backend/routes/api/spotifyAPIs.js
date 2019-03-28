@@ -33,9 +33,7 @@ module.exports = {
       params: {
         device_id: deviceId
       },
-      data: {
-        context_uri: contextUri
-      }
+      context_uri: contextUri
     });
   },
 
@@ -59,7 +57,7 @@ module.exports = {
   postAddingTracksToPlaylist: async (code, playlistId, trackIds) => {
     const trackURIs = trackIds.map(trackId => `spotify:track:${trackId}`);
     const client = await getSpotifyClient('authorization_code', code);
-    const { data } = await client.requestConfiguration.post(`/playlists/${playlistId}/tracks`, {
+    await client.requestConfiguration.post(`/playlists/${playlistId}/tracks`, {
       uris: trackURIs,
       position: 0
     });
