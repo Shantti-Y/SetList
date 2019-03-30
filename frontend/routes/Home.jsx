@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
-import { createPlaylist } from '@apis/spotifyClient';
+import { createPlaylist } from '@apis';
 
 class Home extends React.Component {
   constructor(props) {
@@ -11,11 +11,11 @@ class Home extends React.Component {
         duration: 0,
         queryWord: ''
       },
-      playlistTracks: []
+      playlistId: undefined,
+      userId: undefined
     }
     this.handleChange = this.handleChange.bind(this);
     this.submitPlaylistCondition = this.submitPlaylistCondition.bind(this);
-    this.loginSpotifyAccount = this.loginSpotifyAccount.bind(this);
   }
 
   handleChange(name, e) {
@@ -29,22 +29,13 @@ class Home extends React.Component {
   }
 
   async submitPlaylistCondition() {
-    const newPlaylist = await createPlaylist(this.state.formValues);
+    const { data } = await createPlaylist(this.state.formValues);
+    console.log(data)
     this.setState({
       ...this.state,
-      playlistTracks: newPlaylist.tracks
+      playlistId: data.playlistId,
+      userId: data.userId
     });
-  }
-
-  async loginSpotifyAccount() {
-    const trackIds = this.state.playlistTracks.map(track => track.id).join(',')
-    console.log(trackIds)
-    const scopes = [
-      'user-read-playback-state', 'user-modify-playback-state', 'user-read-private', 'playlist-modify-private'
-    ].join(' ');
-    const clientId = process.env.SPOTIFY_API_CLIENT_ID;
-    const spotifyURI = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&state=${trackIds}&redirect_uri=${encodeURIComponent(`http://localhost:8080/api/start_playlist`)}`;
-    window.open(spotifyURI, '_blank ', 'width=400,height=500')
   }
 
   render() {
@@ -56,6 +47,14 @@ class Home extends React.Component {
         return total + duration;
       }));
       return `${totalDuration.hours()} : ${totalDuration.minutes()} : ${totalDuration.seconds()}`
+    }
+
+    const URIForSpotifyEmbededPlayer = () => {
+      if(this.state.playlistId && this.state.userId){
+        return `https://open.spotify.com/embed/user/${this.state.userId}/playlist/${this.state.playlistId}`;
+      }else{
+        return undefined
+      }
     }
 
     return (
@@ -78,22 +77,14 @@ class Home extends React.Component {
             />
           </div>
           <button onClick={this.submitPlaylistCondition}>Create Playlist</button>
-
-          <button onClick={this.loginSpotifyAccount}>Play a playlist</button>
         </div>
         <div>
-          <ul>
-            {this.state.playlistTracks.map((track) => {
-              return (
-                <li key={track.id}>
-                  {track.name}
-                </li>
-              )
-            })}
-          </ul>
-          <div>
-            <p>Total duration: {getSumDuration(this.state.playlistTracks)}</p>
-          </div>
+          {(() => {
+            if (URIForSpotifyEmbededPlayer()) {
+              return <iframe src={URIForSpotifyEmbededPlayer()} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+            }
+          })()}
+          
         </div>
       </div>
     )

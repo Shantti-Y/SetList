@@ -1,10 +1,10 @@
 const axios = require('axios');
 const moment = require('moment');
 
-class SpotifyClientSingleton {
-  constructor(expiredDuration, tokenType, accessToken) {
-    this.expiredTime = moment().seconds(expiredDuration);
-    this.requestConfiguration = axios.create({
+class SpotifyClient {
+  constructor(accessToken, tokenType, expiredAt) {
+    this.expiresAt = moment(expiredAt, 'x');
+    this.request = axios.create({
       baseURL: 'https://api.spotify.com/v1',
       timeout: 4000,
       headers: {
@@ -16,16 +16,22 @@ class SpotifyClientSingleton {
   }
 
   isExpired() {
-    return moment() >= this.expiredTime
+    const nowTime = moment(moment().format('x'))
+    return nowTime >= this.expiresAt
   }
 }
-let spotifyClient;
 
-const getSpotifyClient = async (grantType, code = '') => {
-  if (spotifyClient === undefined || spotifyClient.isExpired()) {
-    await postFetchingAuthorizationToken(grantType, code);
-  }
-  return spotifyClient
+const getSpotifyClient = authenticateData => {
+  return new SpotifyClient(
+    authenticateData.accessToken,
+    authenticateData.tokenType,
+    authenticateData.expiresAt
+  )
+}
+
+const judgeAuthenticated = authenticateData => {
+  const client = getSpotifyClient(authenticateData)
+  return !client.isExpired();
 }
 
 const postFetchingAuthorizationToken = async (grantType, code) => {
@@ -34,7 +40,7 @@ const postFetchingAuthorizationToken = async (grantType, code) => {
   const params = grantType === 'authorization_code' ? {
     grant_type: 'authorization_code',
     code: code,
-    redirect_uri: 'http://localhost:8080/api/start_playlist'
+    redirect_uri: 'http://localhost:8080/callback'
   } : {
     grant_type: 'client_credentials'
   }
@@ -52,8 +58,7 @@ const postFetchingAuthorizationToken = async (grantType, code) => {
       password: clientSecret
     }
   });
-  spotifyClient = new SpotifyClientSingleton(
-    data.expires_in, data.token_type, data.access_token);
+  return data
 }
 
-module.exports = { getSpotifyClient };
+module.exports = { getSpotifyClient, postFetchingAuthorizationToken, judgeAuthenticated };
