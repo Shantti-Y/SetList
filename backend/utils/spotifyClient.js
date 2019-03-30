@@ -1,5 +1,6 @@
 const axios = require('axios');
 const moment = require('moment');
+const { errorContexts, transmitErrorContext } = require('./errorContexts');
 
 class SpotifyClient {
   constructor(accessToken, tokenType, expiresAt) {
@@ -32,12 +33,22 @@ class SpotifyClient {
         limit: 50,
         offset: offset
       }
+    }).catch(error => {
+      const status = error.response.status;
+      if(status === 404){
+        return {
+          data: { tracks: { items: [] } }
+        }
+      }else{
+        transmitErrorContext(status);
+      }
     });
     return data.tracks.items
   }
 
   async getCurrentUserProfile() {
-    const { data } = await this.request.get('/me');
+    const { data } = await this.request.get('/me')
+      .catch(error => transmitErrorContext(error.response.status));
     return data
   }
 
@@ -46,14 +57,20 @@ class SpotifyClient {
       name: playlistName,
       description: playlistDescription,
       public: false
-    });
+    }).catch(error => transmitErrorContext(error.response.status));
     return data
   }
 
   async getPlaylist(playlistId) {
     const { data } = await this.request.get(`/playlists/${playlistId}`)
       .catch(error => {
-        return { data: undefined }
+        const status = error.response.status;
+        // TODO: Check if there's another status to handle like this.
+        if(status === 404){
+          return { data: undefined }
+        }else{
+          transmitErrorContext(status)
+        }
       });
     return data
   }
@@ -63,12 +80,11 @@ class SpotifyClient {
     await this.request.post(`/playlists/${playlistId}/tracks`, {
       uris: trackURIs,
       position: 0
-    });
+    }).catch(error => transmitErrorContext(error.response.status));
     return true
   }
 
   async deleteRemovingTracksFromPlaylist(playlistId, trackIds) {
-    
     const trackObjects = trackIds.map(trackId => {
       return { uri: `spotify:track:${trackId}` }
     });
@@ -76,10 +92,12 @@ class SpotifyClient {
       data: {
         tracks: trackObjects
       }
-    });
+    }).catch(error => transmitErrorContext(error.response.status));
     return data
   }
 }
+
+
 
 const getSpotifyClient = authenticateData => {
   return new SpotifyClient(
