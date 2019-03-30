@@ -3,8 +3,6 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require('./webpack.config.js');
 
-const apiUrl = 'localhost:8080';
-
 const entryDir = '..'
 
 module.exports = merge(common, {
@@ -15,5 +13,10 @@ module.exports = merge(common, {
     filename: "[name].js",
     libraryTarget: "umd"
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.apiUrl': JSON.stringify('http://localhost:8080/api')
+    })
+  ]
 });
