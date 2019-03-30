@@ -7,9 +7,10 @@ const authenticationData = {
   expires_at: window.localStorage.getItem('expires_at')
 }
 
-export const createPlaylist = async condition => {
+export const createPlaylist = async (condition, playlist_id) => {
   const { data } = await client.post(`/initialize_playlist`, {
     condition: condition,
+    playlist_id: playlist_id,
     authentication: authenticationData
   });
   return data
