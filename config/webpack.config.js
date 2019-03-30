@@ -8,7 +8,8 @@ const entryDir = '../frontend/entrypoints';
 
 module.exports = {
   entry: {
-    index: ['@babel/polyfill', path.resolve(__dirname, `${entryDir}/index.js`)]
+    index: ['@babel/polyfill', path.resolve(__dirname, `${entryDir}/index.js`)],
+    callback: ['@babel/polyfill', path.resolve(__dirname, `${entryDir}/callback.js`)]
   },
   module: {
     rules: [
