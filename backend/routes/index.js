@@ -1,4 +1,4 @@
-const mainRouter = require('./frontend');
+const mainRouter = require('./main');
 const apiRouter = require('./api');
 
 module.exports = { mainRouter, apiRouter }

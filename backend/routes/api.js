@@ -1,20 +1,7 @@
 const express = require('express');
-const moment = require('moment');
 const apiRouter = express.Router();
-const path = require('path');
-
-const {
-  getTracksBySearch,
-  getCurrentUserProfile,
-  postCreatingNewPlaylist,
-  getPlaylist,
-  postAddingTracksToPlaylist,
-  deleteRemovingTracksFromPlaylist,
-  getUserDevices,
-  putStartingUserPlayback
-} = require('./spotify/spotifyAPIs')
-
-const { judgeAuthenticated } = require('./spotify/spotifyClient');
+const { judgeAuthenticated } = require('../utils/authentication');
+const { getSpotifyClient } = require('../utils/spotifyClient');
 
 const localStorageToAuthenticateData = localStorageData => {
   return {
@@ -26,9 +13,9 @@ const localStorageToAuthenticateData = localStorageData => {
 
 apiRouter.post('/check_auth', (req, res) => {
   const authenticated = judgeAuthenticated(localStorageToAuthenticateData(req.body));
-  if (authenticated){
+  if (authenticated) {
     res.status(200).send();
-  }else{
+  } else {
     res.status(401).send({
       error: { message: 'Authentication failed. Please log in.' }
     });
@@ -36,7 +23,9 @@ apiRouter.post('/check_auth', (req, res) => {
 });
 
 apiRouter.post('/initialize_playlist', async (req, res) => {
-  const authenticationCode = localStorageToAuthenticateData(req.body.authentication)
+  const authenticationCode = localStorageToAuthenticateData(req.body.authentication);
+  const localPlaylistId = req.body.playlist_id;
+  const spotifyClient = getSpotifyClient(authenticationCode);
   const playlistName = `Your Today's Set List`;
   const playlistDescription = `A set list created by randomly selected a bunch of tracks which almost you like.`;
 
@@ -56,7 +45,7 @@ apiRouter.post('/initialize_playlist', async (req, res) => {
 
     while (true) {
       // Get tracks from invoking Spotify API
-      const responseFromSpotifyAPI = await getTracksBySearch(authenticationCode, targetWord, pageIdx);
+      const responseFromSpotifyAPI = await spotifyClient.getTracksBySearch(targetWord, pageIdx);
       // If response has no track, an execution must be stopped and return a response along with error status code.
       if (responseFromSpotifyAPI.length === 0) {
         res.status(404).send({
@@ -94,23 +83,33 @@ apiRouter.post('/initialize_playlist', async (req, res) => {
     }
   }
 
-  const getPlaylist = () => {
-    
+  const editPlaylist = async (playlistId, tracks) => {
+    const playlistInfo = await spotifyClient.deleteRemovingTracksFromPlaylist(playlistId, tracks.map(track => track.id))
+    await spotifyClient.postAddingTracksToPlaylist(playlistId, tracks.map(track => track.id))
+    return playlistInfo 
   }
 
   const createPlaylist = async (userInfo, tracks) => {
-    const playlistInfo = await postCreatingNewPlaylist(authenticationCode, userInfo.id, playlistName, playlistDescription)
-    await postAddingTracksToPlaylist(authenticationCode, playlistInfo.id, tracks.map(track => track.id))
+    const playlistInfo = await spotifyClient.postCreatingNewPlaylist(userInfo.id, playlistName, playlistDescription)
+    await spotifyClient.postAddingTracksToPlaylist(playlistInfo.id, tracks.map(track => track.id))
     return playlistInfo
   }
 
   const tracks = await getTracksInSpecifiedDuration(req.body.condition.queryWord, (req.body.condition.duration * 60 * 1000));
-  const userInfo = await getCurrentUserProfile(authenticationCode);
-  const playlistInfo = await createPlaylist(userInfo, tracks)
-  res.status(201).json({ data: {
-    playlistId: playlistInfo.id,
-    userId: userInfo.id
-  } })
+  const userInfo = await spotifyClient.getCurrentUserProfile();
+  const playlist = await spotifyClient.getPlaylist(localPlaylistId)
+  let playlistInfo
+  if(playlist){
+    playlistInfo = playlist;
+    await editPlaylist(playlist.id, tracks)
+  }else{
+    playlistInfo = await createPlaylist(userInfo, tracks)
+  }
+  res.status(201).json({
+    data: {
+      playlist: playlistInfo
+    }
+  })
 });
 
 module.exports = apiRouter; 

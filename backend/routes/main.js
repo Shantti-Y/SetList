@@ -2,16 +2,15 @@ const path = require('path');
 const express = require('express');
 const mainRouter = express.Router();
 
-const { postFetchingAuthorizationToken } = require('./api/spotify/spotifyClient');
+const { postFetchingAuthorizationToken } = require('../utils/authentication');
 
 /////////////////////////////
 /* General Entry endpoints */
 /////////////////////////////
-const indexHtmlFile = path.resolve(__dirname, '../index.html');
+const indexHtmlFile = path.resolve(__dirname, '../templates/index.html');
 mainRouter.get('/(*{0}|home|about)', (_, res) => {
   res.sendFile(indexHtmlFile);
 });
-
 
 mainRouter.get('/callback', async (req, res) => {
   // spotifyからauth_tokenとtoekn_typeとexpiredを取得
@@ -30,7 +29,7 @@ mainRouter.get('/callback', async (req, res) => {
   }
 });
 
-const callbackHtmlFile = path.resolve(__dirname, '../callback.html');
+const callbackHtmlFile = path.resolve(__dirname, '../templates/callback.html');
 mainRouter.get('/auth_token', async (_, res) => {
   res.sendFile(callbackHtmlFile);
 });
