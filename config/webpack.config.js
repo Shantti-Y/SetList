@@ -14,7 +14,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)?$/,
+        test: /\.(js|jsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
@@ -27,25 +27,21 @@ module.exports = {
         }
       },
       {
-        test: /\.(ts|tsx)?$/,
+        test: /\.(ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'ts-loader'
       },
       {
-        test: /\.scss$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: 'style-loader!css-loader!sass-loader'
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
       },
       {
         test: /\.(png|jpg|gif)$/,
-        use: [
-          {
-            loader: 'url-loader!file-loader',
-            options: {
-              name: '/assets/[path][name].[ext]'
-            }
-          }
-        ]
+        loader: 'url-loader!file-loader'
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        loader: 'file-loader?name=semantic/dist/themes/default/assets/fonts/[name].[ext]'
       }
     ]
   },
