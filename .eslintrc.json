@@ -1,0 +1,11 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "parser": "babel-eslint",
+  "rules": {
+    "space-before-blocks": ["error", "always"],
+    "semi": ["error", "always"]
+  }
+}
