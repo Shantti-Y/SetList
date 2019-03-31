@@ -1,4 +1,5 @@
-import moment from 'moment';
+
+import { setAuthenticationData } from '@apis/authentication';
 
 const paramsFromURI = () => {
   const hash = {};
@@ -13,8 +14,6 @@ const paramsFromURI = () => {
     
 window.onload = async () => {
   const authorizationData = paramsFromURI();
-  window.localStorage.setItem('access_token', authorizationData.access_token);
-  window.localStorage.setItem('token_type', authorizationData.token_type);
-  window.localStorage.setItem('expires_at', moment().seconds(authorizationData.expires_in).format('x'));
+  setAuthenticationData(authorizationData.access_token, authorizationData.token_type, authorizationData.expires_in);
   window.close();
 };

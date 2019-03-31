@@ -1,23 +1,17 @@
 import client from './client';
-
-const authenticationData = {
-  access_token: window.localStorage.getItem('access_token'),
-  token_type: window.localStorage.getItem('token_type'),
-  expires_in: window.localStorage.getItem('expires_in'),
-  expires_at: window.localStorage.getItem('expires_at')
-};
+import { getAuthenticationData } from '@apis/authentication';
 
 export const createPlaylist = async (condition, playlist_id) => {
   const { data } = await client.post(`/initialize_playlist`, {
     condition: condition,
     playlist_id: playlist_id,
-    authentication: authenticationData
+    authentication: getAuthenticationData()
   });
   return data;
 };
 
 export const checkAuth = async () => {
-  const { data } = await client.post('/check_auth', {
-    ...authenticationData
+  await client.post('/check_auth', {
+    ...getAuthenticationData()
   });
 };
