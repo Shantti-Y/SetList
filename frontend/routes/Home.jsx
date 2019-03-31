@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { Redirect } from 'react-router';
+import { Grid, Row, Col, InputGroup, Icon, Input, Button } from 'rsuite/lib';
 
 import { createPlaylist } from '@apis';
 
@@ -24,12 +25,12 @@ class Home extends React.Component {
     this.submitPlaylistCondition = this.submitPlaylistCondition.bind(this);
   }
 
-  handleChange(name, e) {
+  handleChange(name, value) {
     this.setState({
       ...this.state,
       formValues: {
         ...this.state.formValues,
-        [name]: e.target.value
+        [name]: value
       }
     });
   }
@@ -90,33 +91,49 @@ class Home extends React.Component {
     if (this.state.isAuthenticated) {
       return (
         <div>
-          <div>
-            <p>{this.state.errorMessage}</p>
-            <div>
-              <label>Playing Time</label>
-              <input
-                type="number"
-                value={this.state.formValues.duration}
-                onChange={e => this.handleChange('duration', e)}
-              />
-            </div>
-            <div>
-              <label>Word</label>
-              <input
-                type="text"
-                value={this.state.formValues.queryWord}
-                onChange={e => this.handleChange('queryWord', e)}
-              />
-            </div>
-            <button onClick={this.submitPlaylistCondition}>Create Playlist</button>
-          </div>
-          <div>
-            {(() => {
-              if (URIForSpotifyEmbededPlayer()) {
-                return <iframe src={URIForSpotifyEmbededPlayer()} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>;
-              }
-            })()}
-          </div>
+          <Grid fluid>
+            <Row>
+              <Col xs={24}><p>{this.state.errorMessage}</p></Col>
+            </Row>
+            <Row>
+              <Col xs={4} sm={8}></Col>
+              <Col xs={16} sm={8}>
+                <InputGroup inside>
+                  <InputGroup.Addon>
+                    <Icon size="lg" icon="clock-o" />
+                  </InputGroup.Addon>
+                  <Input
+                    size="lg"
+                    type="number"
+                    value={this.state.formValues.duration}
+                    onChange={value => this.handleChange('duration', value)}
+                  ></Input>
+                </InputGroup>
+                <InputGroup inside>
+                  <InputGroup.Addon>
+                    <Icon size="lg" icon="search" />
+                  </InputGroup.Addon>
+                  <Input
+                    size="lg"
+                    type="text"
+                    value={this.state.formValues.queryWord}
+                    onChange={value => this.handleChange('queryWord', value)}
+                  />
+                </InputGroup>
+                <Button appearance="primary" onClick={this.submitPlaylistCondition}>Create Playlist</Button>
+              </Col>
+              <Col xs={4} sm={8}></Col>
+            </Row>
+            <Row>
+              <Col xs={24}>
+                {(() => {
+                  if (URIForSpotifyEmbededPlayer()) {
+                    return <iframe src={URIForSpotifyEmbededPlayer()} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>;
+                  }
+                })()}
+              </Col>
+            </Row>
+          </Grid>
         </div>
       );
     } else {

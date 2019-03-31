@@ -21,7 +21,8 @@ module.exports = {
           options: {
             presets: [
               '@babel/preset-env',
-              '@babel/preset-react'
+              '@babel/preset-react',
+              'rsuite'
             ]
           }
         }
@@ -34,6 +35,19 @@ module.exports = {
       {
         test: /\.css$/,
         loader: 'style-loader!css-loader'
+      },
+      {
+        test: /\.less$/,
+        use: [{
+          loader: "style-loader"
+        }, {
+          loader: "css-loader"
+        }, {
+          loader: "less-loader",
+          options: {
+            javascriptEnabled: true
+          }
+        }]
       },
       {
         test: /\.(png|jpg|gif)$/,
@@ -49,8 +63,9 @@ module.exports = {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.jpg', '.scss'],
     alias: {
       '@apis': path.resolve(__dirname, `${frontendDir}/apis`),
-      '@layouts': path.resolve(__dirname, `${frontendDir}/layouts`),
+      '@assets': path.resolve(__dirname, `${frontendDir}/assets`),
       '@components': path.resolve(__dirname, `${frontendDir}/components`),
+      '@layouts': path.resolve(__dirname, `${frontendDir}/layouts`),
       '@routes': path.resolve(__dirname, `${frontendDir}/routes`)
     }
   },

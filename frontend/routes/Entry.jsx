@@ -56,7 +56,7 @@ class Entry extends React.Component {
     }else{
       return (
         <div id="entry">
-          <button onClick={this.loginSpotifyAccount}>Login</button>
+          <button onClick={this.loginSpotifyAccount} >Login</button>
         </div>
       );
     }    
