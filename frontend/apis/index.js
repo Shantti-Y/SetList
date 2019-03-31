@@ -5,7 +5,7 @@ const authenticationData = {
   token_type: window.localStorage.getItem('token_type'),
   expires_in: window.localStorage.getItem('expires_in'),
   expires_at: window.localStorage.getItem('expires_at')
-}
+};
 
 export const createPlaylist = async (condition, playlist_id) => {
   const { data } = await client.post(`/initialize_playlist`, {
@@ -13,11 +13,11 @@ export const createPlaylist = async (condition, playlist_id) => {
     playlist_id: playlist_id,
     authentication: authenticationData
   });
-  return data
+  return data;
 };
 
 export const checkAuth = async () => {
   const { data } = await client.post('/check_auth', {
     ...authenticationData
   });
-}
+};

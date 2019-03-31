@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const distDir = path.resolve(__dirname, `../dist/dev`);
 
-const mainApp = express()
+const mainApp = express();
 const apiApp = express();
 
 apiApp.use(express.static(distDir));
@@ -20,6 +20,6 @@ mainApp.use('/api', apiApp);
 
 const PORT = process.env.PORT || 8080;
 mainApp.listen(PORT, () => {
-  console.log(`App listening to ${PORT}....`)
-  console.log('Press Ctrl+C to quit.')
+  console.log(`App listening to ${PORT}....`);
+  console.log('Press Ctrl+C to quit.');
 });

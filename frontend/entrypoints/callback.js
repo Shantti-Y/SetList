@@ -9,7 +9,7 @@ const paramsFromURI = () => {
     }
   });
   return hash;
-}
+};
     
 window.onload = async () => {
   const authorizationData = paramsFromURI();

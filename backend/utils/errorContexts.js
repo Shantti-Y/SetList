@@ -19,10 +19,10 @@ const errorContexts = {
     statusText: 'Internal Server Error',
     message: `Possible to be web server's error happened.`
   }
-}
+};
 
 const transmitErrorContext = status => {
   throw errorContexts[status.toString()];
-}
+};
 
-module.exports = { errorContexts, transmitErrorContext }
+module.exports = { errorContexts, transmitErrorContext };

@@ -8,13 +8,13 @@ class Entry extends React.Component {
     super(props);
     this.state = {
       isAuthenticated: false
-    }
+    };
 
     this.loginSpotifyAccount = this.loginSpotifyAccount.bind(this);
     this.authenticate = this.authenticate.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.authenticate();
   }
 
@@ -32,21 +32,25 @@ class Entry extends React.Component {
         isAuthenticated: true
       });
     }).catch(() => {
-      console.log("CATCH!!!!!")
+      console.log("CATCH!!!!!");
       // TODO put any message to notify users to re-login
     });
   }
 
   render() {
     window.addEventListener('storage', () => {
-      this.authenticate()
+      this.authenticate();
     });
 
-    return (
-          <div id="entry">
-            <button onClick={this.loginSpotifyAccount}>Login</button>
-          </div>
-        )
+    if(this.state.isAuthenticated) {
+      return <Redirect to="/home" />;
+    }else{
+      return (
+        <div id="entry">
+          <button onClick={this.loginSpotifyAccount}>Login</button>
+        </div>
+      );
+    } 
   }
 }
 

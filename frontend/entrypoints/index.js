@@ -15,7 +15,7 @@ const App = () => {
         <Route path="/about" exact component={About} />
       </div>
     </BrowserRouter>
-  )
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById('app'));

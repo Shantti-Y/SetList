@@ -3,7 +3,7 @@ const { getSpotifyClient } = require('./spotifyClient');
 
 module.exports = {
   judgeAuthenticated(authenticateData) {
-    const client = getSpotifyClient(authenticateData)
+    const client = getSpotifyClient(authenticateData);
     return !client.isExpired();
   },
   
@@ -16,7 +16,7 @@ module.exports = {
       redirect_uri: 'http://localhost:8080/callback'
     } : {
         grant_type: 'client_credentials'
-      }
+      };
     const { data } = await axios({
       url: 'https://accounts.spotify.com/api/token',
       method: 'POST',
@@ -31,7 +31,7 @@ module.exports = {
         password: clientSecret
       }
     });
-    return data
+    return data;
   }
-}
+};
 

@@ -17,11 +17,11 @@ class SpotifyClient {
   }
 
   isExpired() {
-    if(this.expiresAt === undefined){
-      return true
+    if(this.expiresAt === undefined) {
+      return true;
     }
-    const nowTime = moment(moment().format('x'))
-    return nowTime >= this.expiresAt
+    const nowTime = moment(moment().format('x'));
+    return nowTime >= this.expiresAt;
   }
 
   async getTracksBySearch(queryWord, pageIdx) {
@@ -35,21 +35,21 @@ class SpotifyClient {
       }
     }).catch(error => {
       const status = error.response.status;
-      if(status === 404){
+      if(status === 404) {
         return {
           data: { tracks: { items: [] } }
-        }
+        };
       }else{
         transmitErrorContext(status);
       }
     });
-    return data.tracks.items
+    return data.tracks.items;
   }
 
   async getCurrentUserProfile() {
     const { data } = await this.request.get('/me')
       .catch(error => transmitErrorContext(error.response.status));
-    return data
+    return data;
   }
 
   async postCreatingNewPlaylist(userId, playlistName, playlistDescription) {
@@ -58,7 +58,7 @@ class SpotifyClient {
       description: playlistDescription,
       public: false
     }).catch(error => transmitErrorContext(error.response.status));
-    return data
+    return data;
   }
 
   async getPlaylist(playlistId) {
@@ -66,13 +66,13 @@ class SpotifyClient {
       .catch(error => {
         const status = error.response.status;
         // TODO: Check if there's another status to handle like this.
-        if(status === 404){
-          return { data: undefined }
+        if(status === 404) {
+          return { data: undefined };
         }else{
-          transmitErrorContext(status)
+          transmitErrorContext(status);
         }
       });
-    return data
+    return data;
   }
 
   async postAddingTracksToPlaylist(playlistId, trackIds) {
@@ -81,19 +81,19 @@ class SpotifyClient {
       uris: trackURIs,
       position: 0
     }).catch(error => transmitErrorContext(error.response.status));
-    return true
+    return true;
   }
 
   async deleteRemovingTracksFromPlaylist(playlistId, trackIds) {
     const trackObjects = trackIds.map(trackId => {
-      return { uri: `spotify:track:${trackId}` }
+      return { uri: `spotify:track:${trackId}` };
     });
     const { data } = await this.request.delete(`/playlists/${playlistId}/tracks`, {
       data: {
         tracks: trackObjects
       }
     }).catch(error => transmitErrorContext(error.response.status));
-    return data
+    return data;
   }
 }
 
@@ -104,7 +104,7 @@ const getSpotifyClient = authenticateData => {
     authenticateData.accessToken,
     authenticateData.tokenType,
     authenticateData.expiresAt
-  )
-}
+  );
+};
 
 module.exports = { getSpotifyClient };
