@@ -1,6 +1,6 @@
 const axios = require('axios');
 const moment = require('moment');
-const { errorContexts, transmitErrorContext } = require('./errorContexts');
+const { transmitErrorContext } = require('./errorContexts');
 
 class SpotifyClient {
   constructor(accessToken, tokenType, expiresAt) {
@@ -17,7 +17,7 @@ class SpotifyClient {
   }
 
   isExpired() {
-    if(this.expiresAt === undefined) {
+    if(this.expiresAt === undefined || isNaN(this.expiresAt)) {
       return true;
     }
     const nowTime = moment(moment().format('x'));
@@ -96,8 +96,6 @@ class SpotifyClient {
     return data;
   }
 }
-
-
 
 const getSpotifyClient = authenticateData => {
   return new SpotifyClient(

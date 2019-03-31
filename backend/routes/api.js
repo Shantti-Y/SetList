@@ -2,6 +2,7 @@ const express = require('express');
 const apiRouter = express.Router();
 const { judgeAuthenticated } = require('../utils/authentication');
 const { getSpotifyClient } = require('../utils/spotifyClient');
+const { transmitErrorContext } = require('../utils/errorContexts');
 
 const localStorageToAuthenticateData = localStorageData => {
   return {
@@ -12,21 +13,27 @@ const localStorageToAuthenticateData = localStorageData => {
 };
 
 apiRouter.post('/check_auth', (req, res) => {
-  const authenticated = judgeAuthenticated(localStorageToAuthenticateData(req.body));
-  if (authenticated) {
-    res.status(200).send();
-  } else {
-    res.status(401).send({
-      error: { message: 'Authentication failed. Please log in.' }
-    });
+  try {
+    const authenticationCode = localStorageToAuthenticateData(req.body);
+    if (judgeAuthenticated(authenticationCode)) {
+      res.status(200).send();
+    } else {
+      transmitErrorContext(401)
+    }
+  } catch(error) {
+    res.status(error.status).json(error);
   }
 });
 
 apiRouter.post('/initialize_playlist', async (req, res) => {
   try {
     const authenticationCode = localStorageToAuthenticateData(req.body.authentication);
-    const localPlaylistId = req.body.playlist_id;
+    if (!judgeAuthenticated(authenticationCode)) {
+      transmitErrorContext(401)
+    }
     const spotifyClient = getSpotifyClient(authenticationCode);
+
+    const localPlaylistId = req.body.playlist_id;
     const playlistName = `Your Today's Set List`;
     const playlistDescription = `A set list created by randomly selected a bunch of tracks which almost you like.`;
 
@@ -49,14 +56,7 @@ apiRouter.post('/initialize_playlist', async (req, res) => {
         const responseFromSpotifyAPI = await spotifyClient.getTracksBySearch(targetWord, pageIdx);
         // If response has no track, an execution must be stopped and return a response along with error status code.
         if (responseFromSpotifyAPI.length === 0) {
-          // 
-          res.status(404).send({
-            error: {
-              status: 404,
-              message: `Couldn't create playlist due to lack of tracks.`
-            }
-          });
-          break;
+          transmitErrorContext(404);
         }
         const fetchedTracksFromSpotify = responseFromSpotifyAPI;
         // [0m30s, 1m00s, 1m30s...10m00s]
