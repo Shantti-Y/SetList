@@ -2,6 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router';
 
 import { checkAuth } from '@apis';
+import { hasAuthenticationData } from '@apis/authentication';
 
 class Entry extends React.Component {
   constructor(props) {
@@ -14,8 +15,8 @@ class Entry extends React.Component {
     this.authenticate = this.authenticate.bind(this);
   }
 
-  componentDidMount() {
-    this.authenticate();
+  async componentDidMount() {
+    await this.authenticate();
   }
 
   async loginSpotifyAccount() {
@@ -26,23 +27,31 @@ class Entry extends React.Component {
   }
 
   async authenticate() {
-    await checkAuth().then(() => {
-      this.setState({
-        ...this.state,
-        isAuthenticated: true
+    await checkAuth()
+      .then(() => {
+        this.setState({
+          ...this.state,
+          isAuthenticated: true
+        });
+      })
+      .catch(() => {
+        console.log("CATCH!!!!!");
+        this.setState({
+          ...this.state,
+          isAuthenticated: false
+        });
+        // TODO put any message to notify users to re-login
       });
-    }).catch(() => {
-      console.log("CATCH!!!!!");
-      // TODO put any message to notify users to re-login
-    });
   }
 
   render() {
-    window.addEventListener('storage', () => {
-      this.authenticate();
+    window.addEventListener('storage', async () => {
+      if(hasAuthenticationData()){
+        await this.authenticate();
+      }
     });
 
-    if(this.state.isAuthenticated) {
+    if(this.state.isAuthenticated){
       return <Redirect to="/home" />;
     }else{
       return (
@@ -50,7 +59,7 @@ class Entry extends React.Component {
           <button onClick={this.loginSpotifyAccount}>Login</button>
         </div>
       );
-    } 
+    }    
   }
 }
 

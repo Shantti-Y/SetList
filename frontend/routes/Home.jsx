@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { Redirect } from 'react-router';
 
 import { createPlaylist } from '@apis';
 
@@ -15,7 +16,9 @@ class Home extends React.Component {
         playlistId: undefined,
         userId: undefined,
         tracks: []
-      }
+      },
+      isAuthenticated: true,
+      errorMessage: undefined
     };
     this.handleChange = this.handleChange.bind(this);
     this.submitPlaylistCondition = this.submitPlaylistCondition.bind(this);
@@ -36,17 +39,33 @@ class Home extends React.Component {
       return window.localStorage.getItem('playlist_id') || '';
     };
 
-    const { data } = await createPlaylist(this.state.formValues, getPlaylistIdInLocalStorage());
-    this.setState({
-      ...this.state,
-      playListInfo: {
-        playlistId: data.playlist.id,
-        userId: data.playlist.owner.id,
-        tracks: data.playlist.tracks.item
-      }
-    });
-    window.localStorage.setItem('playlist_id', this.state.playListInfo.playlistId);
-
+    await createPlaylist(this.state.formValues, getPlaylistIdInLocalStorage())
+      .then(response => {
+        const { data } = response;
+        this.setState({
+          ...this.state,
+          playListInfo: {
+            playlistId: data.playlist.id,
+            userId: data.playlist.owner.id,
+            tracks: data.playlist.tracks.item
+          }
+        });
+        window.localStorage.setItem('playlist_id', this.state.playListInfo.playlistId);
+      })
+      .catch(error => {
+        if(error.response.status === 401){
+          this.setState({
+            ...this.state,
+            isAuthenticated: false
+          });
+        }else{
+          const message = error.response.data.message
+          this.setState({
+            ...this.state,
+            errorMessage: message
+          });
+        }
+      });
   }
 
   render() {
@@ -68,37 +87,41 @@ class Home extends React.Component {
       }
     };
 
-    return (
-      <div>
+    if (this.state.isAuthenticated) {
+      return (
         <div>
           <div>
-            <label>Playing Time</label>
-            <input
-              type="number"
-              value={this.state.formValues.duration}
-              onChange={e => this.handleChange('duration', e)}
-            />
+            <p>{this.state.errorMessage}</p>
+            <div>
+              <label>Playing Time</label>
+              <input
+                type="number"
+                value={this.state.formValues.duration}
+                onChange={e => this.handleChange('duration', e)}
+              />
+            </div>
+            <div>
+              <label>Word</label>
+              <input
+                type="text"
+                value={this.state.formValues.queryWord}
+                onChange={e => this.handleChange('queryWord', e)}
+              />
+            </div>
+            <button onClick={this.submitPlaylistCondition}>Create Playlist</button>
           </div>
           <div>
-            <label>Word</label>
-            <input
-              type="text"
-              value={this.state.formValues.queryWord}
-              onChange={e => this.handleChange('queryWord', e)}
-            />
+            {(() => {
+              if (URIForSpotifyEmbededPlayer()) {
+                return <iframe src={URIForSpotifyEmbededPlayer()} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>;
+              }
+            })()}
           </div>
-          <button onClick={this.submitPlaylistCondition}>Create Playlist</button>
         </div>
-        <div>
-          {(() => {
-            if (URIForSpotifyEmbededPlayer()) {
-              return <iframe src={URIForSpotifyEmbededPlayer()} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>;
-            }
-          })()}
-          
-        </div>
-      </div>
-    );
+      );
+    } else {
+      return <Redirect to="/" />;
+    }
   }
 }
 
