@@ -20,7 +20,7 @@ class SpotifyClient {
     if(this.expiresAt === undefined || isNaN(this.expiresAt)) {
       return true;
     }
-    const nowTime = moment(moment().format('x'));
+    const nowTime = moment();
     return nowTime >= this.expiresAt;
   }
 
@@ -72,6 +72,12 @@ class SpotifyClient {
           transmitErrorContext(status);
         }
       });
+    return data;
+  }
+
+  async getTracksOfPlaylist(playlistId) {
+    const { data } = await this.request.get(`/playlists/${playlistId}/tracks`)
+      .catch(error => transmitErrorContext(error.response.status));
     return data;
   }
 

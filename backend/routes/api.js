@@ -18,7 +18,7 @@ apiRouter.post('/check_auth', (req, res) => {
     if (judgeAuthenticated(authenticationCode)) {
       res.status(200).send();
     } else {
-      transmitErrorContext(401)
+      transmitErrorContext(401);
     }
   } catch(error) {
     res.status(error.status).json(error);
@@ -86,7 +86,8 @@ apiRouter.post('/initialize_playlist', async (req, res) => {
     };
 
     const editPlaylist = async (playlistId, tracks) => {
-      const playlistInfo = await spotifyClient.deleteRemovingTracksFromPlaylist(playlistId, tracks.map(track => track.id));
+      const tracksForRemoval = await spotifyClient.getTracksOfPlaylist(playlistId)
+      const playlistInfo = await spotifyClient.deleteRemovingTracksFromPlaylist(playlistId, tracksForRemoval.items.map(item => item.track.id));
       await spotifyClient.postAddingTracksToPlaylist(playlistId, tracks.map(track => track.id));
       return playlistInfo; 
     };
