@@ -29,7 +29,7 @@ apiRouter.post('/initialize_playlist', async (req, res) => {
   try {
     const authenticationCode = localStorageToAuthenticateData(req.body.authentication);
     if (!judgeAuthenticated(authenticationCode)) {
-      transmitErrorContext(401)
+      transmitErrorContext(401);
     }
     const spotifyClient = getSpotifyClient(authenticationCode);
 
@@ -86,7 +86,7 @@ apiRouter.post('/initialize_playlist', async (req, res) => {
     };
 
     const editPlaylist = async (playlistId, tracks) => {
-      const tracksForRemoval = await spotifyClient.getTracksOfPlaylist(playlistId)
+      const tracksForRemoval = await spotifyClient.getTracksOfPlaylist(playlistId);
       const playlistInfo = await spotifyClient.deleteRemovingTracksFromPlaylist(playlistId, tracksForRemoval.items.map(item => item.track.id));
       await spotifyClient.postAddingTracksToPlaylist(playlistId, tracks.map(track => track.id));
       return playlistInfo; 

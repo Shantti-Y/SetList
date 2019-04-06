@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
-import 'semantic-ui-css/semantic.min.css'
+import 'semantic-ui-css/semantic.min.css';
 
 import { Button } from 'react-toolbox/lib/button';
 
-import Layout from '@layouts'
+import Layout from '@layouts';
 
 import Entry from '@routes/Entry';
 import Home from '@routes/Home';
