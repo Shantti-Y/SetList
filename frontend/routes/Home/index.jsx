@@ -1,23 +1,212 @@
 import React from 'react';
 import moment from 'moment';
 import { Redirect } from 'react-router';
-import { Container, Header, List, Grid, Segment, Message } from 'semantic-ui-react'
+import {
+  Container,
+  Transition,
+  Loader,
+  Button,
+  Input,
+  Grid,
+  Segment,
+  Icon,
+  Form
+} from 'semantic-ui-react';
 
 import { createPlaylist } from '@apis';
 
-const DismissableMessageBox = props => {
-  if (props.visible) {
+const SpotifyEmbedPlayer = props => {
+  const getSumDuration = () => {
+    if (props.playlistInfo.tracks.length === 0) {
+      return 0;
+    }
+    const totalDuration = moment.duration(props.playlistInfo.tracks.map(track => track.duration_ms).reduce((total, duration) => {
+      return total + duration;
+    }));
+    return `${totalDuration.hours()} : ${totalDuration.minutes()} : ${totalDuration.seconds()}`;
+  };
+
+  const URIForSpotifyEmbededPlayer = () => {
+    return `https://open.spotify.com/embed/user/${props.playlistInfo.userId}/playlist/${props.playlistInfo.playlistId}`;
+  };
+  return (
+    <iframe
+      src={URIForSpotifyEmbededPlayer()}
+      width="100%"
+      height="380"
+      frameBorder="0"
+      allowtransparency="true"
+      allow="encrypted-media"></iframe>
+  );
+}
+
+const InputField = props => {
+  const handleChange = e => {
+    props.onValueChange(e.target.value);
+  }
+  return (
+    <Form.Field>
+      <label>{props.labelName}</label>
+      <Input
+        iconPosition='left'
+        placeholder={props.labelName}
+        type={props.type}
+        onChange={e => handleChange(e)}
+        value={props.value}
+      >
+        <Icon name={props.iconName} />
+        <input />
+      </Input>
+    </Form.Field>
+  )
+}
+
+const PlaylistFormfield = props => {
+  const formStructure = {
+    duration: {
+      label: 'Duration',
+      key: 'duration',
+      icon: 'clock outline',
+      type: 'number'
+    },
+    queryWord: {
+      label: 'Search',
+      key: 'queryWord',
+      icon: 'search',
+      type: 'text'
+    }
+  }
+  return (
+    <Form>
+      <InputField
+        labelName={formStructure.duration.label}
+        iconName={formStructure.duration.icon}
+        type={formStructure.duration.type}
+        onValueChange={value => props.onValueChange(formStructure.duration.key, value)}
+        value={props.formValues.duration}
+      />
+
+      <InputField
+        labelName={formStructure.queryWord.label}
+        iconName={formStructure.queryWord.icon}
+        type={formStructure.queryWord.type}
+        onValueChange={value => props.onValueChange(formStructure.queryWord.key, value)}
+        value={props.formValues.queryWord}
+      />
+      <Form.Field>
+        <Button
+          color="linkedin"
+          onClick={props.onValueSubmitted}
+          icon labelPosition="right"
+        >
+          Create Playlist<Icon name='play' />
+        </Button>
+      </Form.Field>
+    </Form>
+  )
+}
+
+const MainActionWithoutPlaylistInfo = props => {
+  return (
+    <Container>
+      <Grid textAlign="center">
+        <Grid.Row>
+          <Grid.Column mobile={0} tablet={3} computer={3} largeScreen={3} />
+          <Grid.Column mobile={16} tablet={10} computer={10} largeScreen={10}>
+            <PlaylistFormfield
+              formValues={props.formValues}
+              onValueChange={(name, value) => props.onValueChange(name, value)}
+              onValueSubmitted={props.onValueSubmitted}
+            />
+          </Grid.Column>
+          <Grid.Column mobile={0} tablet={3} computer={3} largeScreen={3} />
+        </Grid.Row>
+      </Grid>
+    </Container>
+  )
+}
+
+const MainActionWithPlaylistInfo = props => {
+  return (
+    <Container>
+      <Grid stackable textAlign="center">
+        <Grid.Row>
+          <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
+            <PlaylistFormfield
+              formValues={props.formValues}
+              onValueChange={(name, value) => props.onValueChange(name, value)}
+              onValueSubmitted={props.onValueSubmitted}
+            />
+          </Grid.Column>
+          <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
+            <SpotifyEmbedPlayer playlistInfo={props.playlistInfo} />
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </Container>
+  )
+}
+
+const MainActionContainer = props => {
+  if (props.playlistInfo.playlistId && props.playlistInfo.userId){
     return (
-      <Message
-        onDismiss={props.onCloseMessageBox}
-        header={props.message}
+      <MainActionWithPlaylistInfo
+        formValues={props.formValues}
+        playlistInfo={props.playlistInfo}
+        onValueChange={(name, value) => props.onValueChange(name, value)}
+        onValueSubmitted={() => props.onValueSubmitted()}
       />
     )
   }else{
     return (
-      <div></div>
+      <MainActionWithoutPlaylistInfo
+        formValues={props.formValues}
+        onValueChange={(name, value) => props.onValueChange(name, value)}
+        onValueSubmitted={() => props.onValueSubmitted()}
+      />
     )
   }
+}
+
+class LoaderScreen extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      percentage: 0
+    }
+  }
+
+  componentDidMount() {
+    this.timer;
+  }
+
+  componentDidUpdate(){
+    if(this.state.percentage === 100){
+      this.props.onCompleteLoading();
+      clearTimeout(this.timer);
+      this.setState({
+        ...this.state,
+        percentage: 0
+      })
+    }
+
+    if(this.props.isLoading){
+      this.timer = setTimeout(() => {
+        this.setState({
+          ...this.state,
+          percentage: this.state.percentage + 1
+        })
+      }, 200);
+    }
+  }
+
+  render(){
+    return (
+      <Transition visible={this.props.isLoading} animation='fade up' duration={400}>
+        <Loader active inline="centered" indeterminate>{this.state.percentage}%</Loader>
+      </Transition>
+    )
+  } 
 }
 
 class Home extends React.Component {
@@ -25,21 +214,23 @@ class Home extends React.Component {
     super(props);
     this.state = {
       formValues: {
-        duration: 0,
+        duration: '',
         queryWord: ''
       },
-      playListInfo: {
+      playlistInfo: {
         playlistId: undefined,
         userId: undefined,
         tracks: []
       },
       isAuthenticated: true,
       errorMessage: undefined,
-      errorMessageVisible: false
+      errorMessageVisible: false,
+      isFetching: false
     };
     this.handleMessageBox = this.handleMessageBox.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.submitPlaylistCondition = this.submitPlaylistCondition.bind(this);
+    this.handleFinishingFetching = this.handleFinishingFetching.bind(this);
   }
 
   handleMessageBox(status){
@@ -49,13 +240,12 @@ class Home extends React.Component {
     })
   }
 
-  handleChange(name, e) {
+  handleChange(name, value) {
+    const newFormValues = this.state.formValues
+    newFormValues[name] = value
     this.setState({
       ...this.state,
-      formValues: {
-        ...this.state.formValues,
-        [name]: e.target.value
-      }
+      formValues: newFormValues
     });
   }
 
@@ -63,99 +253,75 @@ class Home extends React.Component {
     const getPlaylistIdInLocalStorage = () => {
       return window.localStorage.getItem('playlist_id') || '';
     };
-
-  await createPlaylist(this.state.formValues, getPlaylistIdInLocalStorage())
-    .then(response => {
-      const { data } = response;
-      this.setState({
-        ...this.state,
-        playListInfo: {
-          playlistId: data.playlist.id,
-          userId: data.playlist.owner.id,
-          tracks: data.playlist.tracks.item
+    this.setState({
+      ...this.state,
+      playlistInfo: {},
+      isFetching: true
+    });
+    
+    await createPlaylist(this.state.formValues, getPlaylistIdInLocalStorage())
+      .then(response => {
+        const { data } = response;
+        this.setState({
+          ...this.state,
+          playlistInfo: {
+            playlistId: data.playlist.id,
+            userId: data.playlist.owner.id,
+            tracks: data.playlist.tracks.items
+          }
+        });
+        window.localStorage.setItem('playlist_id', this.state.playlistInfo.playlistId);
+      })
+      .catch(error => {
+        if(error.response.status === 401){
+          this.setState({
+            ...this.state,
+            isAuthenticated: false,
+            isFetching: false
+          });
+        }else{
+          const message = error.response.data.message
+          this.setState({
+            ...this.state,
+            errorMessage: message,
+            errorMessageVisible: true,
+            isFetching: false
+          });
         }
       });
-      window.localStorage.setItem('playlist_id', this.state.playListInfo.playlistId);
-    })
-    .catch(error => {
-      if(error.response.status === 401){
-        this.setState({
-          ...this.state,
-          isAuthenticated: false
-        });
-      }else{
-        const message = error.response.data.message
-        this.setState({
-          ...this.state,
-          errorMessage: message,
-          errorMessageVisible: true
-        });
-      }
+  }
+
+  handleFinishingFetching(){
+    this.setState({
+      ...this.state,
+      isFetching: false
     });
   }
 
   render() {
-    const getSumDuration = () => {
-      if (this.state.playlistInfo.tracks.length === 0) {
-        return 0;
-      }
-      const totalDuration = moment.duration(this.state.playlistInfo.tracks.map(track => track.duration_ms).reduce((total, duration) => {
-        return total + duration;
-      }));
-      return `${totalDuration.hours()} : ${totalDuration.minutes()} : ${totalDuration.seconds()}`;
-    };
-
-    const URIForSpotifyEmbededPlayer = () => {
-      if(this.state.playListInfo.playlistId && this.state.playListInfo.userId) {
-        return `https://open.spotify.com/embed/user/${this.state.playListInfo.userId}/playlist/${this.state.playListInfo.playlistId}`;
-      }else{
-        return undefined;
-      }
-    };
-
     if (this.state.isAuthenticated) {
       return (
         <div id="home">
-          <Segment vertical style={{ padding: '5em 0em' }}>
-            <Container>
-              <Grid divided stackable>
-                <Grid.Row>
-                  <DismissableMessageBox
-                    onCloseMessageBox={() => this.handleMessageBox(false)}
-                    message={this.state.errorMessage}
-                    visible={this.state.errorMessageVisible}
-                  />
-                </Grid.Row>
-                <Grid.Row>
-                  <Grid.Column width={3}>
-                  <input
-                    size="lg"
-                    type="number"
-                    value={this.state.formValues.duration}
-                    onChange={e => this.handleChange('duration', e)}
-                  />
-                  <input
-                    size="lg"
-                    type="text"
-                    value={this.state.formValues.queryWord}
-                    onChange={e => this.handleChange('queryWord', e)}
-                  />
-                <button appearance="primary" onClick={this.submitPlaylistCondition}>Create Playlist</button>
-              
-                  </Grid.Column>
-                </Grid.Row>
-                <Grid.Row>
-                  {(() => {
-                    if (URIForSpotifyEmbededPlayer()) {
-                      return <iframe src={URIForSpotifyEmbededPlayer()} width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>;
-                    }
-                  })()}
-                </Grid.Row>
-              </Grid>
-
-            
-              </Container>
-              </Segment>
+          <div className="segment-wrapper" style={{ 'min-height': '390px' }}>
+            <Segment vertical style={{ padding: '3em 0em' }}>
+              {(() => {
+                if(!this.state.isFetching){
+                  return (
+                    <MainActionContainer
+                      formValues={this.state.formValues}
+                      playlistInfo={this.state.playlistInfo}
+                      onValueChange={(name, value) => this.handleChange(name, value)}
+                      onValueSubmitted={() => this.submitPlaylistCondition()}
+                    />
+                  )
+                }
+              })()}
+              <LoaderScreen
+                isLoading={this.state.isFetching}
+                onCompleteLoading={() => this.handleFinishingFetching()}
+              />
+            </Segment>
+          </div>
         </div>
       );
     } else {
