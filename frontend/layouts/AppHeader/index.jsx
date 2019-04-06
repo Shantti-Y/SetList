@@ -13,7 +13,7 @@ const AppHeader = props => {
         icon={<Icon name="bars" />}
       />
       <Menu.Header className="header-name">
-        <h1>Set List</h1>
+        <h1>Setlify</h1>
       </Menu.Header>
     </Menu>
   );

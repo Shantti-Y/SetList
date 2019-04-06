@@ -8,31 +8,20 @@ const AppFooter = () => {
       <Container>
         <Grid divided inverted stackable>
           <Grid.Row>
-            <Grid.Column width={3}>
-              <Header inverted as='h4' content='About' />
-              <List link inverted>
-                <List.Item as='a'>Sitemap</List.Item>
-                <List.Item as='a'>Contact Us</List.Item>
-                <List.Item as='a'>Religious Ceremonies</List.Item>
-                <List.Item as='a'>Gazebo Plans</List.Item>
-              </List>
+            <Grid.Column width={6}>
+              <Header as='h4' inverted> Visit Spotify</Header>
+              <p>Setlify needs your Spotify Account. Unless you're not the user of it, please subscribe it to use Setlify's feature.</p>
+              <a src="https://www.spotify.com/is" target="_blank">https://www.spotify.com/is</a>
             </Grid.Column>
-            <Grid.Column width={3}>
-              <Header inverted as='h4' content='Services' />
-              <List link inverted>
-                <List.Item as='a'>Banana Pre-Order</List.Item>
-                <List.Item as='a'>DNA FAQ</List.Item>
-                <List.Item as='a'>How To Access</List.Item>
-                <List.Item as='a'>Favorite X-Men</List.Item>
-              </List>
+            <Grid.Column width={6}>
+              <Header as='h4' inverted>Spotify for Developers</Header>
+              <p>Setlify mostly relies on Spotify Web API. If you're some kinds of a developer and interested in it, I recommend you to visit the following web site.</p>
+              <a src="https://developer.spotify.com/documentation/web-api" target="_blank">https://developer.spotify.com/documentation/web-api</a>
             </Grid.Column>
-            <Grid.Column width={7}>
-              <Header as='h4' inverted>
-                Footer Header
-              </Header>
-              <p>
-                Extra space for a call to action inside the footer that could help re-engage users.
-              </p>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column textAlign="center">
+              <p>2019 © Takahiro Yoshioka / Shantti-Y</p>
             </Grid.Column>
           </Grid.Row>
         </Grid>
