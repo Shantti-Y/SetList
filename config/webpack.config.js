@@ -50,8 +50,8 @@ module.exports = {
         }]
       },
       {
-        test: /\.(png|jpg|gif)$/,
-        loader: 'url-loader!file-loader'
+        test: /\.(png|jpg|gif|mp4)$/,
+        loader: 'file-loader'
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
