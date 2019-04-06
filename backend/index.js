@@ -4,7 +4,11 @@ const bodyParser = require('body-parser');
 const router = require('./routes');
 require('dotenv').config();
 
-const distDir = path.resolve(__dirname, `../dist/dev`);
+const isProd = process.env.NODE_ENV === 'production';
+
+const distDir = isProd
+  ? path.resolve(__dirname, `../dist/prod`)
+  : path.resolve(__dirname, `../dist/dev`);
 
 const mainApp = express();
 const apiApp = express();

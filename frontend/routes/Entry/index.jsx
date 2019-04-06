@@ -142,7 +142,7 @@ const StartButtonForSpotifyUser = props => {
   const loginSpotify = async () => {
     const scopes = ['user-read-private', 'playlist-modify-private'].join(' ');
     const clientId = process.env.SPOTIFY_API_CLIENT_ID;
-    const spotifyURI = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(`http://localhost:8080/callback`)}`;
+    const spotifyURI = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(`${process.env.rootUrl}/callback`)}`;
     window.open(spotifyURI, '_blank ', 'width=400,height=500');
   }
 

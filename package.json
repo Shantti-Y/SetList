@@ -5,8 +5,10 @@
   "main": "./backend/index.js",
   "scripts": {
     "dev-server": "node ./backend/index.js",
-    "dev-client": "webpack --config ./config/webpack.dev.js -w --progress --color",
-    "lint": "eslint backend/**/*.js frontend/**/*.js -c ./.eslintrc.json --fix"
+    "dev-client": "webpack --config ./config/webpack.prod.js -w --progress --color",
+    "lint": "eslint backend/**/*.js frontend/**/*.js -c ./.eslintrc.json --fix",
+    "build": "webpack --config ./config/webpack.prod.js --progress --color",
+    "deploy": "node ./backend/index.js"
   },
   "author": "Takahiro Yoshioka (Shantti_Y)",
   "license": "MIT",
