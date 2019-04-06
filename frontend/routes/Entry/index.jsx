@@ -5,20 +5,18 @@ import { Responsive, Container, Header, Button, Icon, Grid, Segment, Image } fro
 import { checkAuth } from '@apis';
 import { hasAuthenticationData } from '@apis/authentication';
 
-// TODO Organize Design
-const MastheadSection = props => {
+const MastheadSectionOnDesktop = props => {
   return(
-    <Segment
-      inverted
-      textAlign='center'
-      vertical
-      style={{ padding: 0 }}
-    >
-      <Responsive style={{ height: '400px', width: '100%', position: 'relative', overflow: 'hidden' }}>
-        <video
-          autoPlay
-          muted
-          loop
+      <Responsive as={Segment} inverted textAlign='center' attached
+        minWidth={769}
+        style={{
+          padding: 0,
+          minHeight: '400px',
+          width: '100%',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+        <video autoPlay muted loop
           style={{
             filter: "opacity(40%)",
             minHeight: '100%',
@@ -31,25 +29,19 @@ const MastheadSection = props => {
           <source src={require('@assets/videos/masthead.mp4')} />
         </video>
         <div style={{
-          position: "fixed",
-          top: "140px",
+          position: "absolute",
+          top: "120px",
           width: "100%",
           padding: "20px"
         }}>
-          <Header
-            as='h1'
-            content='Do something '
-            inverted
+          <Header as='h1' content='Do something' inverted
             style={{
               fontSize: '2em',
               fontWeight: 'normal',
               marginBottom: 0
             }}
           />
-          <Header
-            as='h2'
-            content='during listening to music in Spotify'
-            inverted
+          <Header as='h2' content='during listening to music in Spotify' inverted
             style={{
               fontSize: '1.7em',
               fontWeight: 'normal'
@@ -58,7 +50,54 @@ const MastheadSection = props => {
           <StartButtonForSpotifyUser text="Start" />
         </div>
       </Responsive>
-    </Segment>
+  )
+}
+
+const MastheadSectionOnMobile = props => {
+  return(
+      <Responsive as={Segment} inverted textAlign='center' attached
+        maxWidth={768}
+        style={{
+          padding: 0,
+          height: '320px',
+          width: '100%',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+        <Image
+          src={require('@assets/images/mastheads/connected-plugged-earpud.jpg')}
+          style={{
+            filter: "opacity(40%)",
+            minHeight: '100%',
+            Width: '100%',
+            position: 'absolute',
+            top: 0,
+            zIndex: 0,
+            margin: '0 auto'
+          }}
+        />
+        <div style={{
+          position: "absolute",
+          top: "50px",
+          width: "100%",
+          padding: "20px"
+        }}>
+          <Header as='h1' content='Do something' inverted
+            style={{
+              fontSize: '2em',
+              fontWeight: 'normal',
+              marginBottom: 0
+            }}
+          />
+          <Header as='h2' content='during listening to music in Spotify' inverted
+            style={{
+              fontSize: '1.7em',
+              fontWeight: 'normal'
+            }}
+          />
+          <StartButtonForSpotifyUser text="Start" />
+        </div>
+      </Responsive>
   )
 }
 
@@ -70,7 +109,7 @@ const UsecaseSection = () => {
     { name: 'Relaxing', imagePath: require('@assets/images/useCases/for-relaxing.jpg') }
   ]
   return (
-    <Segment style={{ padding: '8em 0em' }} vertical>
+    <Segment style={{ padding: '4em 0em' }} vertical>
       <Grid container verticalAlign='middle'>
         <Grid.Row>
           <Header
@@ -137,7 +176,7 @@ const DescriptionSection = () => {
     },
   ]
   return(
-    <Segment style={{ padding: '8em 0em' }} vertical>
+    <Segment style={{ padding: '3em 0em' }} vertical>
       <Grid container stackable verticalAlign='middle'>
           {descriptions.map(description => {
             return (
@@ -208,7 +247,8 @@ class Entry extends React.Component {
     }else{
       return (
         <div id="entry">
-          <MastheadSection />
+          <MastheadSectionOnDesktop />
+          <MastheadSectionOnMobile />
           <DescriptionSection />
           <UsecaseSection />
         </div>
