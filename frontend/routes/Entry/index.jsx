@@ -6,66 +6,157 @@ import { checkAuth } from '@apis';
 import { hasAuthenticationData } from '@apis/authentication';
 
 // TODO Organize Design
-const ResponsiveHeaderOnDesktop = props => {
+const MastheadSection = props => {
   return(
-    <Responsive getWidth={() => window.innerWidth} minWidth={768}>
-      <Container text>
-        <Header
-          as='h1'
-          content='Imagine-a-Company'
-          inverted
+    <Segment
+      inverted
+      textAlign='center'
+      vertical
+      style={{ padding: 0 }}
+    >
+      <Responsive style={{ height: '400px', width: '100%', position: 'relative', overflow: 'hidden' }}>
+        <video
+          autoPlay
+          muted
+          loop
           style={{
-            fontSize: '2em',
-            fontWeight: 'normal',
-            marginBottom: 0,
-          }}
-        />
-        <Header
-          as='h2'
-          content='Do whatever you want when you want to.'
-          inverted
-          style={{
-            fontSize: '1.7em',
-            fontWeight: 'normal',
-          }}
-        />
-        <Button primary onClick={props.onLogin}>
-          Login
-          <Icon name='right arrow' />
-        </Button>
-      </Container>
-    </Responsive>
+            filter: "opacity(40%)",
+            minHeight: '100%',
+            width: '100%',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            zIndex: 0
+          }}>
+          <source src={require('@assets/videos/masthead.mp4')} />
+        </video>
+        <div style={{
+          position: "fixed",
+          top: "140px",
+          width: "100%",
+          padding: "20px"
+        }}>
+          <Header
+            as='h1'
+            content='Do something '
+            inverted
+            style={{
+              fontSize: '2em',
+              fontWeight: 'normal',
+              marginBottom: 0
+            }}
+          />
+          <Header
+            as='h2'
+            content='during listening to music in Spotify'
+            inverted
+            style={{
+              fontSize: '1.7em',
+              fontWeight: 'normal'
+            }}
+          />
+          <StartButtonForSpotifyUser text="Start" />
+        </div>
+      </Responsive>
+    </Segment>
+  )
+}
+
+const UsecaseSection = () => {
+  const useCases = [
+    { name: 'Running', imagePath: require('@assets/images/useCases/for-running.jpg') },
+    { name: 'Studying', imagePath: require('@assets/images/useCases/for-studying.jpg') },
+    { name: 'Traveling', imagePath: require('@assets/images/useCases/for-traveling.jpg') },
+    { name: 'Relaxing', imagePath: require('@assets/images/useCases/for-relaxing.jpg') }
+  ]
+  return (
+    <Segment style={{ padding: '8em 0em' }} vertical>
+      <Grid container verticalAlign='middle'>
+        <Grid.Row>
+          <Header
+            as='h2'
+            content='For the use of...'
+            style={{
+              fontSize: '2em',
+              fontWeight: 'normal',
+              marginBottom: 0,
+            }}
+          />
+        </Grid.Row>
+        <Grid.Row columns={4}>
+          {useCases.map(useCase => {
+            return (
+              <Grid.Column floated="left" mobile={8} tablet={4} computer={4} largeScreen={4}>
+                <Image src={useCase.imagePath} size='small' />
+                <Header as='h3' content={useCase.name}/>
+              </Grid.Column>
+            );
+          })}
+        </Grid.Row>
+      </Grid>
+    </Segment>
+  )
+}
+
+const StartButtonForSpotifyUser = props => {
+
+  const loginSpotify = async () => {
+    const scopes = ['user-read-private', 'playlist-modify-private'].join(' ');
+    const clientId = process.env.SPOTIFY_API_CLIENT_ID;
+    const spotifyURI = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(`http://localhost:8080/callback`)}`;
+    window.open(spotifyURI, '_blank ', 'width=400,height=500');
+  }
+
+  return (
+    <Button primary onClick={loginSpotify}>
+      {props.text}
+      <Icon name='right arrow' />
+    </Button>
   )
 }
 
 const DescriptionSection = () => {
+  const descriptions = [
+    {
+      header: 'Create Playlists in Insanely Fast Speed',
+      imagePath: require('@assets/images/descriptions/using-spotify.jpg'),
+      imagePosition: 'right',
+      paragraph: `
+        Setlify creates an playlist by using the power of Spotify. What you need is a disired duration of a playlist and any search words.
+        Once you apply them, a new playlist is launched in 5 seconds.
+      `
+    },
+    {
+      header: 'Focus Your Work During Playing Music',
+      imagePath: require('@assets/images/descriptions/listening-something.jpg'),
+      imagePosition: 'left',
+      paragraph: `
+        Mostly these playlists created by Setlify aren't used for just listening to. They are helpful for completing whatever you do.
+        At the same time when a playlist is finished, your work is done.
+      `
+    },
+  ]
   return(
     <Segment style={{ padding: '8em 0em' }} vertical>
       <Grid container stackable verticalAlign='middle'>
-        <Grid.Row>
-          <Grid.Column width={8}>
-            <Header as='h3' style={{ fontSize: '2em' }}>
-              We Help Companies and Companions
-            </Header>
-            <p style={{ fontSize: '1.33em' }}>
-              We can give your company superpowers to do things that they never thought possible.
-              Let us delight your customers and empower your needs... through pure data analytics.
-            </p>
-            <Header as='h3' style={{ fontSize: '2em' }}>
-              We Make Bananas That Can Dance
-            </Header>
-            <p style={{ fontSize: '1.33em' }}>
-              Yes that's right, you thought it was the stuff of dreams, but even bananas can be
-              bioengineered.
-            </p>
-          </Grid.Column>
-          <Grid.Column floated='right' width={6}>
-            <Image bordered rounded size='large' src='/images/wireframe/white-image.png' />
-          </Grid.Column>
-        </Grid.Row>
+          {descriptions.map(description => {
+            return (
+              <Grid.Row>
+                <Grid.Column width={8}>
+                  <Header as='h3' style={{ fontSize: '2em' }}>
+                    {description.header}
+                  </Header>
+                  <p style={{ fontSize: '1.33em' }}>{description.paragraph}</p>
+                </Grid.Column>
+                <Grid.Column floated='left' width={8}>
+                  <Image size='large' src={description.imagePath} />
+                </Grid.Column>
+              </Grid.Row>
+            )
+          })}
         <Grid.Row>
           <Grid.Column textAlign='center'>
-            <Button size='huge'>Check Them Out</Button>
+            <StartButtonForSpotifyUser text="So Let's Get Startted!" />
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -80,19 +171,11 @@ class Entry extends React.Component {
       isAuthenticated: false
     };
 
-    this.loginSpotifyAccount = this.loginSpotifyAccount.bind(this);
     this.authenticate = this.authenticate.bind(this);
   }
 
   async componentDidMount() {
     await this.authenticate();
-  }
-
-  async loginSpotifyAccount() {
-    const scopes = ['user-read-private', 'playlist-modify-private'].join(' ');
-    const clientId = process.env.SPOTIFY_API_CLIENT_ID;
-    const spotifyURI = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(`http://localhost:8080/callback`)}`;
-    window.open(spotifyURI, '_blank ', 'width=400,height=500');
   }
 
   async authenticate() {
@@ -125,14 +208,9 @@ class Entry extends React.Component {
     }else{
       return (
         <div id="entry">
-          <Segment
-            inverted
-            textAlign='center'
-            vertical
-          >
-            <ResponsiveHeaderOnDesktop onLogin={this.loginSpotifyAccount} />
-          </Segment>
+          <MastheadSection />
           <DescriptionSection />
+          <UsecaseSection />
         </div>
       );
     }    
