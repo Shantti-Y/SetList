@@ -6,8 +6,8 @@ const AppFooter = () => {
   return (
     <Segment inverted vertical style={{ padding: '5em 0em' }}>
       <Container>
-        <Grid divided inverted stackable>
-          <Grid.Row>
+        <Grid divided inverted>
+          <Grid.Row >
             <Grid.Column width={6}>
               <Header as='h4' inverted> Visit Spotify</Header>
               <p>Setlify needs your Spotify Account. Unless you're not the user of it, please subscribe it to use Setlify's feature.</p>
