@@ -16,8 +16,8 @@ module.exports = merge(common, {
   devtool: 'source-map',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.rootUrl': JSON.stringify('https://shantti-y-setlist.glitch.me'),
-      'process.env.apiUrl': JSON.stringify('https://shantti-y-setlist.glitch.me')
+      'process.env.rootUrl': JSON.stringify('https://setlify-236901.appspot.com/'),
+      'process.env.apiUrl': JSON.stringify('https://setlify-236901.appspot.com/')
     })
   ]
 });
