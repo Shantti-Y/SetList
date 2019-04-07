@@ -7,11 +7,9 @@ import './style.scss';
 const AppHeader = props => {
   return (
     <Menu inverted attached style={{ padding: '0 1em' }}>
-      <Menu.Header className="header-name">
-        <Link to="/">
-          <h1>Setlify</h1>
-        </Link>
-      </Menu.Header>
+      <Link to="/" style={{ margin: '3px 0 0 11px' }}>
+        <h1>Setlify</h1>
+      </Link>
       <Menu.Menu position='right'>
         <Menu.Item postion="right">
           <Link to="/about"><Icon name="help circle" size="large" /></Link>

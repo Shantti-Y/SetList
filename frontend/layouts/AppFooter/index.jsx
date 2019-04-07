@@ -8,15 +8,15 @@ const AppFooter = () => {
       <Container>
         <Grid divided inverted>
           <Grid.Row >
-            <Grid.Column width={6}>
+            <Grid.Column mobile={8}>
               <Header as='h4' inverted> Visit Spotify</Header>
               <p>Setlify needs your Spotify Account. Unless you're not the user of it, please subscribe it to use Setlify's feature.</p>
-              <a src="https://www.spotify.com/is" target="_blank">https://www.spotify.com/is</a>
+              <a href="https://www.spotify.com/is" target="_blank">Official Spotify Site</a>
             </Grid.Column>
-            <Grid.Column width={6}>
+            <Grid.Column mobile={8}>
               <Header as='h4' inverted>Spotify for Developers</Header>
               <p>Setlify mostly relies on Spotify Web API. If you're some kinds of a developer and interested in it, I recommend you to visit the following web site.</p>
-              <a src="https://developer.spotify.com/documentation/web-api" target="_blank">https://developer.spotify.com/documentation/web-api</a>
+              <a href="https://developer.spotify.com/documentation/web-api" target="_blank">Spotify Web API</a>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>

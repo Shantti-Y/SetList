@@ -129,7 +129,7 @@ const MainActionWithoutPlaylistInfo = props => {
       <Grid textAlign="center">
         <Grid.Row>
           <Grid.Column mobile={1} tablet={3} computer={3} largeScreen={3} />
-          <Grid.Column mobile={14} tablet={10} computer={10} largeScreen={10}>
+          <Grid.Column mobile={13} tablet={10} computer={10} largeScreen={10}>
             <PlaylistFormfield
               formValues={props.formValues}
               onValueChange={(name, value) => props.onValueChange(name, value)}
