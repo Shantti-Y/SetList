@@ -14,7 +14,7 @@ const AppHeader = props => {
       </Menu.Header>
       <Menu.Menu position='right'>
         <Menu.Item postion="right">
-          <Link to="/about"><Icon name="help circle" /></Link>
+          <Link to="/about"><Icon name="help circle" size="large" /></Link>
         </Menu.Item>
         <Menu.Item postion="right" style={{ width: 0, padding: 0 }} />
       </Menu.Menu>

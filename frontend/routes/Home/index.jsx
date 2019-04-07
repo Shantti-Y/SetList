@@ -15,6 +15,22 @@ import {
 
 import { createPlaylist } from '@apis';
 
+import parser from 'ua-parser-js'
+
+const SpotifyAppOpenerButton = props => {
+  const URIForSpotifyAppPlayer = () => {
+    return `spotify:user:${props.playlistInfo.userId}:playlist:${props.playlistInfo.playlistId}`;
+  };
+  return (
+    <Button href={URIForSpotifyAppPlayer()}color="green"
+      icon labelPosition="right"
+      type="button"
+    >
+      Open Playlist in Spotify<Icon name='spotify' size="big" />
+    </Button>
+  );
+}
+
 const SpotifyEmbedPlayer = props => {
   const getSumDuration = () => {
     if (props.playlistInfo.tracks.length === 0) {
@@ -100,7 +116,7 @@ const PlaylistFormfield = props => {
           icon labelPosition="right"
           type="button"
         >
-          Create Playlist<Icon name='play' />
+          Create Playlist<Icon name='play' size="large" />
         </Button>
       </Form.Field>
     </Form>
@@ -112,15 +128,15 @@ const MainActionWithoutPlaylistInfo = props => {
     <Container>
       <Grid textAlign="center">
         <Grid.Row>
-          <Grid.Column mobile={0} tablet={3} computer={3} largeScreen={3} />
-          <Grid.Column mobile={16} tablet={10} computer={10} largeScreen={10}>
+          <Grid.Column mobile={1} tablet={3} computer={3} largeScreen={3} />
+          <Grid.Column mobile={14} tablet={10} computer={10} largeScreen={10}>
             <PlaylistFormfield
               formValues={props.formValues}
               onValueChange={(name, value) => props.onValueChange(name, value)}
               onValueSubmitted={props.onValueSubmitted}
             />
           </Grid.Column>
-          <Grid.Column mobile={0} tablet={3} computer={3} largeScreen={3} />
+          <Grid.Column mobile={1} tablet={3} computer={3} largeScreen={3} />
         </Grid.Row>
       </Grid>
     </Container>
@@ -140,7 +156,14 @@ const MainActionWithPlaylistInfo = props => {
             />
           </Grid.Column>
           <Grid.Column mobile={16} tablet={8} computer={8} largeScreen={8}>
-            <SpotifyEmbedPlayer playlistInfo={props.playlistInfo} />
+            {(() => {
+              const deviceName = parser(navigator.userAgent).device.type
+              if (deviceName && deviceName === 'mobile'){
+                return <SpotifyAppOpenerButton playlistInfo={props.playlistInfo} />
+              }else{
+                return <SpotifyEmbedPlayer playlistInfo={props.playlistInfo} />
+              }
+            })()}
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -216,7 +239,7 @@ class LoaderScreen extends React.Component {
   render(){
     return (
       <Transition visible={this.props.isLoading} animation='fade up' duration={400}>
-        <Loader active inline="centered" indeterminate>{this.state.percentage}%</Loader>
+        <Loader active inline="centered" size="large" indeterminate>{this.state.percentage}%</Loader>
       </Transition>
     )
   } 
@@ -312,11 +335,13 @@ class Home extends React.Component {
   }
 
   render() {
+    
     if (this.state.isAuthenticated) {
       return (
         <div id="home">
-          <div className="segment-wrapper" style={{ 'min-height': '390px' }}>
+          <div className="segment-wrapper" style={{ 'minHeight': '390px' }}>
             <Segment vertical style={{ padding: '3em 0em' }}>
+              
               {(() => {
                 if(!this.state.isFetching){
                   return (
