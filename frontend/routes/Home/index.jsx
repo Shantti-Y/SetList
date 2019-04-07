@@ -98,6 +98,7 @@ const PlaylistFormfield = props => {
           color="linkedin"
           onClick={props.onValueSubmitted}
           icon labelPosition="right"
+          type="button"
         >
           Create Playlist<Icon name='play' />
         </Button>
