@@ -191,13 +191,25 @@ class LoaderScreen extends React.Component {
       })
     }
 
+    const timeoutInterval = percentage => {
+      if (percentage > 70 && percentage <= 100 ){
+        return 10
+      }else if(percentage > 20 && percentage <= 70){
+        return 20
+      }else if(percentage > 4 && percentage <= 20){
+        return 100
+      }else{
+        return 250
+      }
+    }
+
     if(this.props.isLoading){
       this.timer = setTimeout(() => {
         this.setState({
           ...this.state,
           percentage: this.state.percentage + 1
         })
-      }, 200);
+      }, timeoutInterval(this.state.percentage));
     }
   }
 
