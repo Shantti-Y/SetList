@@ -13,7 +13,7 @@ module.exports = {
     const params = grantType === 'authorization_code' ? {
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: 'http://localhost:8080/callback'
+      redirect_uri: `${process.env.rootUrl}/callback`
     } : {
         grant_type: 'client_credentials'
       };
