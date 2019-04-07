@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { getSpotifyClient } = require('./spotifyClient');
+const { rootUrl } = require('./env')
 
 module.exports = {
   judgeAuthenticated(authenticateData) {
@@ -13,7 +14,7 @@ module.exports = {
     const params = grantType === 'authorization_code' ? {
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: `${process.env.rootUrl}/callback`
+      redirect_uri: `${rootUrl}/callback`
     } : {
         grant_type: 'client_credentials'
       };
@@ -30,6 +31,8 @@ module.exports = {
         username: clientId,
         password: clientSecret
       }
+    }).catch(error => {
+      console.log(error)
     });
     return data;
   }
